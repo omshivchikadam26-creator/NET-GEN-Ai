@@ -1,0 +1,2 @@
+diagnosis_id,timestamp,case_id,symptom,root_cause,osi_layer,confidence,mode
+DIAG-3902af4a86,2026-10-29 04:39:15 UTC,C01,PC cannot ping another PC in the same department,Insufficient deterministic evidence to identify a specific root cause. Additional show command output is required.,Layer 2 - Data Link,Low,Demo Rule-Assisted Mode

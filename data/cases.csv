@@ -1,0 +1,99 @@
+case_id,symptom,topology_note,show_output,expected_fault,osi_layer,concept_tag,severity
+C01,PC cannot ping another PC in the same department,Two PCs connected to the same switch; both should be in VLAN 10,"show vlan brief
+10   USERS   active   Fa0/1
+20   GUEST   active   Fa0/2",PC connected on Fa0/2 is assigned to VLAN 20 instead of VLAN 10,Layer 2 - Data Link,VLAN,Medium
+C02,Users in VLAN 20 cannot communicate with their gateway,Switch connects VLAN 20 PCs to router-on-a-stick gateway,"show vlan brief
+10 USERS active Fa0/1-10
+show interfaces trunk
+Port Fa0/24
+Vlans allowed on trunk: 10",VLAN 20 is missing from the trunk allowed VLAN list,Layer 2 - Data Link,VLAN Trunking,High
+C03,PC connected to a switch port cannot communicate with other users in its VLAN,Department network requires VLAN 30,"show vlan brief
+10 USERS active Fa0/1-12
+20 GUEST active Fa0/13-20
+30 STAFF active",Access port is not assigned to required VLAN 30,Layer 2 - Data Link,VLAN,Medium
+C04,Devices cannot communicate across two switches for VLAN 40,Two switches are connected through an uplink; VLAN 40 should traverse both,"show interfaces trunk
+Port Fa0/24
+Status: not-trunking
+Native vlan: 1",Inter-switch link is not configured as a trunk,Layer 2 - Data Link,VLAN Trunking,High
+C05,PCs in VLAN 50 cannot communicate although IP addresses are correct,VLAN 50 is required for the Finance department,"show vlan brief
+10 USERS active
+20 GUEST active
+30 STAFF active",Required VLAN 50 does not exist on the switch,Layer 2 - Data Link,VLAN,High
+C06,PC cannot reach devices outside its local subnet,PC is in 192.168.10.0/24; router gateway should be 192.168.10.1,"ipconfig
+IPv4 Address: 192.168.10.10
+Subnet Mask: 255.255.255.0
+Default Gateway: 192.168.20.1",PC has an incorrect default gateway,Layer 3 - Network,Default Gateway,High
+C07,PC cannot communicate with hosts expected to be in the same subnet,LAN uses 192.168.1.0/24,"ipconfig
+IPv4 Address: 192.168.1.10
+Subnet Mask: 255.255.0.0
+Default Gateway: 192.168.1.1",Subnet mask is incorrectly configured,Layer 3 - Network,IP Addressing,Medium
+C08,Two PCs experience intermittent connectivity and address conflict warnings,Small LAN with statically configured PCs,"PC1: 192.168.5.10/24
+PC2: 192.168.5.10/24",Duplicate IPv4 address is configured on two devices,Layer 3 - Network,IP Addressing,High
+C09,PC receives an address but cannot reach the local router,LAN gateway should be 10.0.0.1/24,"ipconfig
+IPv4 Address: 10.0.1.25
+Subnet Mask: 255.255.255.0
+Default Gateway: 10.0.0.1",PC address is configured in the wrong subnet,Layer 3 - Network,IP Addressing,High
+C10,PC is configured for DHCP but receives no IP address,PC connects through a switch to a DHCP-enabled router,"show running-config | section dhcp
+(no DHCP pool configuration found)",DHCP pool is missing,Layer 7 - Application,DHCP,High
+C11,Clients receive 169.254.x.x addresses,Clients should receive addresses from DHCP server on same LAN,"show ip interface brief
+GigabitEthernet0/0   unassigned   YES manual   administratively down   down",Gateway interface serving DHCP clients is administratively down,Layer 1/2 - Physical/Data Link,DHCP / Interface,High
+C12,Clients receive IP addresses but cannot reach remote networks,DHCP server should provide gateway 192.168.100.1,"show running-config | section dhcp
+ip dhcp pool USERS
+ network 192.168.100.0 255.255.255.0
+ default-router 192.168.200.1",DHCP pool provides the wrong default gateway,Layer 3 - Network,DHCP,High
+C13,Only a limited number of clients receive DHCP addresses,DHCP pool should support approximately 50 users,"show ip dhcp pool
+Pool USERS
+Utilization mark (high/low): 100 / 0
+Total addresses: 10
+Leased addresses: 10",DHCP address pool is exhausted,Layer 7 - Application,DHCP,Medium
+C14,Users can ping the web server by IP but cannot open it by hostname,DNS server should resolve intranet.local,"ipconfig
+DNS Servers: 192.168.20.50
+nslookup intranet.local
+*** DNS request timed out",DNS server is unreachable or not responding,Layer 7 - Application,DNS,High
+C15,Website hostname fails but internet IP connectivity works,Correct DNS server is 10.10.10.53,"ipconfig
+IPv4 Address: 10.10.10.25
+DNS Servers: 8.8.8.8",Client has an incorrect DNS server address,Layer 7 - Application,DNS,Medium
+C16,Only one internal hostname fails to resolve,DNS server is reachable and other names resolve,"nslookup fileserver.local
+*** server can't find fileserver.local: NXDOMAIN",Required DNS record is missing or incorrectly configured,Layer 7 - Application,DNS,Medium
+C17,LAN A cannot reach LAN B through two routers,R1 connects 192.168.1.0/24; R2 connects 192.168.2.0/24,"R1# show ip route
+C 192.168.1.0/24 is directly connected
+C 10.0.0.0/30 is directly connected",R1 has no route to 192.168.2.0/24,Layer 3 - Network,Static Routing,High
+C18,Traffic from R1 reaches R2 but return traffic fails,Two routers connect two LANs,"R2# show ip route
+C 192.168.2.0/24 is directly connected
+C 10.0.0.0/30 is directly connected",Return route to 192.168.1.0/24 is missing on R2,Layer 3 - Network,Routing,High
+C19,Remote network remains unreachable after adding a static route,Correct next hop from R1 should be 10.0.0.2,"show running-config | include ip route
+ip route 192.168.2.0 255.255.255.0 10.0.1.2",Static route uses an incorrect next-hop address,Layer 3 - Network,Static Routing,High
+C20,Router cannot forward traffic to a directly expected remote network,Dynamic routing is intended between routers,"show ip protocols
+Routing Protocol is """"
+No routing protocols configured",Required routing protocol is not configured,Layer 3 - Network,Dynamic Routing,High
+C21,Remote network was reachable earlier but is now unavailable,Router interface connects to next-hop router,"show ip interface brief
+Serial0/0/0   10.0.0.1   YES manual   down   down",Routing path interface/link is down,Layer 1/3 - Physical/Network,Routing Interface,High
+C22,Users can reach most networks but cannot access a specific server,ACL is used to control access to server 172.16.10.10,"show access-lists
+Extended IP access list 100
+ 10 deny ip 192.168.1.0 0.0.0.255 host 172.16.10.10
+ 20 permit ip any any",ACL explicitly blocks traffic to the server,Layer 3/4 - Network/Transport,ACL,High
+C23,ACL policy appears correct but traffic is still unexpectedly blocked,Inbound ACL should filter traffic from outside interface,"show running-config | include access-group
+ip access-group 101 out",ACL is applied in the wrong direction,Layer 3/4 - Network/Transport,ACL,High
+C24,Guest users can access an internal server that should be restricted,Guest VLAN must be isolated from 10.1.1.10,"show access-lists
+Extended IP access list GUEST_FILTER
+ 10 permit ip any any",ACL lacks the required deny rule for internal server access,Layer 3/4 - Network/Transport,ACL / Security,Critical
+C25,Internal hosts can reach the edge router but cannot access external networks,Router connects inside LAN and outside network,"show running-config | include ip nat inside|ip nat outside
+interface GigabitEthernet0/0
+ ip address 192.168.1.1 255.255.255.0
+interface GigabitEthernet0/1
+ ip address 203.0.113.2 255.255.255.252",NAT inside/outside roles are not configured,Layer 3 - Network,NAT,High
+C26,Only some internal hosts can access external networks,NAT ACL should match 192.168.10.0/24,"show running-config | section ip nat
+ip nat inside source list 1 interface GigabitEthernet0/1 overload
+access-list 1 permit 192.168.20.0 0.0.0.255",NAT access list matches the wrong internal subnet,Layer 3 - Network,NAT,High
+C27,Internet traffic reaches the router but is not translated,Router uses PAT on outside interface,"show ip nat translations
+(no active translations)
+show running-config | include ip nat inside source
+(no NAT translation rule found)",NAT translation rule is missing,Layer 3 - Network,NAT,High
+C28,All devices behind one switch lose connectivity,Access switch uplink connects to distribution switch,"show ip interface brief
+GigabitEthernet0/1   unassigned   YES unset   administratively down   down",Critical uplink interface is administratively shutdown,Layer 1/2 - Physical/Data Link,Interface Status,Critical
+C29,A PC cannot communicate even with its local gateway,PC connects directly to switch access port,"show interfaces Fa0/5
+FastEthernet0/5 is down, line protocol is down",Physical/interface link is down,Layer 1 - Physical,Interface Status,High
+C30,Wireless client cannot access internal network despite connecting to the access point,Corporate SSID should map to VLAN 30,"Wireless AP configuration
+SSID: CorpWiFi
+VLAN: 20
+Expected client VLAN: 30",Wireless SSID is mapped to the wrong VLAN,Layer 2 - Data Link,Wireless / VLAN,High

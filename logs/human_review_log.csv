@@ -1,0 +1,3 @@
+review_id,diagnosis_id,timestamp,case_id,ai_root_cause,human_final_root_cause,review_status,review_comment
+REV-75db227611,DIAG-3902af4a86,2026-10-29 04:39:37 UTC,C01,Insufficient deterministic evidence to identify a specific root cause. Additional show command output is required.,,Rejected,"It is wrong output
+"
