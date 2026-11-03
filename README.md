@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NetSage AI
 
 **AI-assisted Cisco network troubleshooting system for junior network engineers.**
@@ -168,3 +169,6 @@ is never used by the AI engine to generate its answer.
   before applying any network configuration change."**
 - No code path in this application executes or applies a network
   configuration change — the system is diagnostic and advisory only.
+=======
+# NET-GEN-Ai
+>>>>>>> 2b40e1a2bbbff51077f1eeb0409962c80cbd3fd0
